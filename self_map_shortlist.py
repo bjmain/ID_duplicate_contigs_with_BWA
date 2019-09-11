@@ -2,8 +2,9 @@
 import subprocess
 import sys
 
-# Input a shortlist of contigs. This is how I parallelize 
-# a file with a comma separated list of contig names: 238923,238926,238927...
+# Input a shortlist of contigs as an argv like "python self_map_shortlist.py shortlist_1". This is how I parallelize 
+# The file should be a comma separated list of contig names: 238923,238926,238927...
+# In my case I had 20 shortlists of 1416 contigs each. See below for how to parallelize.
 for line in open(sys.argv[1]):
     target_contigs=line.strip().split(",")
 
@@ -16,7 +17,7 @@ for row in open("possibly_redundant_assembly.fa"):
     if row[0]==">":
         if len(seq)>0: 
             # make fastq file for the contig
-            fq = open("/data/home/bmain/tarsalis/aws_results/bwa_self_align/partitioned_scripts/%s_tmp.fq" % (sys.argv[1]), 'w')
+            fq = open("%s_tmp.fq" % (sys.argv[1]), 'w')
             fq.write(contig)
             fq.write("\n")
             contig_seq = "".join(seq)
@@ -29,7 +30,7 @@ for row in open("possibly_redundant_assembly.fa"):
             fq.write("\n")
             fq.close()
             #map the contig to the filtered genome
-            bwa = subprocess.check_output(["bwa", "mem", "/data/home/bmain/tarsalis/aws_results/bwa_self_align/aws_pseudohap_uniq_apr_kraken2.fa", "/data/home/bmain/tarsalis/aws_results/bwa_self_align/partitioned_scripts/%s_tmp.fq" % (sys.argv[1]), "-a", "-v", "0"])
+            bwa = subprocess.check_output(["bwa", "mem", "possibly_redundant_assembly.fa", "%s_tmp.fq" % (sys.argv[1]), "-a", "-v", "0"])
             #process output
             for line in bwa.splitlines():
                 if line[0]!="@":
