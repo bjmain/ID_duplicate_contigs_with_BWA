@@ -1,0 +1,5 @@
+## Collapse_Haplotigs_with_BWA
+
+This script will map each contig to the genome with BWA mem with the -a option to get all hits. 
+Then, I use the CIGAR to determine if >= 99% match. I throw away a contig if there is a larger contig with 99% match compared to self.
+Multiple iterations are likely needed, but it can be parallelized.
